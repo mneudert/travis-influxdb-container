@@ -21,6 +21,7 @@ before_script:
   - cd "${TRAVIS_BUILD_DIR}"
   - influxd config > influxdb.conf
   - nohup "${GOPATH}/bin/influxd" -pidfile ./influxdb.pid -config ./influxdb.conf >>./influxdb.stdout 2>>./influxdb.stderr &
+  - sleep 10
 
 script:
   - curl -v -G http://localhost:8086/query --data-urlencode "q=CREATE DATABASE mydb"
