@@ -1,0 +1,27 @@
+env: VER_INFLUXDB=0.9.0
+
+before_install:
+  - mkdir -p "${GOPATH}/src/github.com/influxdb"
+  - cd "${GOPATH}/src/github.com/influxdb"
+  - wget "https://github.com/influxdb/influxdb/archive/v${VER_INFLUXDB}.tar.gz" -O influxdb.tar.gz && tar -xf influxdb.tar.gz
+  - mv "influxdb-${VER_INFLUXDB}" influxdb
+
+install:
+  - cd "${GOPATH}/src/github.com/influxdb/influxdb"
+  - go get -u -f -t ./...
+  - go build ./...
+  - go install ./...
+
+before_script:
+  - cd "${TRAVIS_BUILD_DIR}"
+  - influxd config > influxdb.conf
+  - nohup "${GOPATH}/bin/influxd" -pidfile ./influxdb.pid -config ./influxdb.conf >>./influxdb.stdout 2>>./influxdb.stderr &
+
+script:
+  - curl -v -G http://localhost:8086/query --data-urlencode "q=CREATE DATABASE mydb"
+  - curl -v -d '{"database" : "mydb", "retentionPolicy" : "myrp", "points": [{"measurement":"cpu","tags":{"region":"useast","host":"server_1","service":"redis"},"fields":{"value":61}}]}' -H "Content-Type: application/json" http://localhost:8086/write
+  - curl -v -G http://localhost:8086/query  --data-urlencode 'db=mydb' --data-urlencode 'SELECT * from cpu'
+
+after_script:
+  - cat "${TRAVIS_BUILD_DIR}/influxdb.stdout"
+  - cat "${TRAVIS_BUILD_DIR}/influxdb.stderr"
