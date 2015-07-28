@@ -8,6 +8,8 @@ before_install:
   - cd "${GOPATH}/src/github.com/influxdb"
   - wget "https://github.com/influxdb/influxdb/archive/v${VER_INFLUXDB}.tar.gz" -O influxdb.tar.gz && tar -xf influxdb.tar.gz
   - mv "influxdb-${VER_INFLUXDB}" influxdb
+  - cd "${GOPATH}/src/github.com/influxdb/influxdb"
+  - git init .
 
 install:
   - cd "${GOPATH}/src/github.com/influxdb/influxdb"
