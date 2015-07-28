@@ -1,6 +1,9 @@
 env: VER_INFLUXDB=0.9.0
 
 before_install:
+  - mkdir "${HOME}/go"
+  - export GOPATH="${HOME}/go"
+  - export PATH="${GOPATH}/bin:${PATH}"
   - mkdir -p "${GOPATH}/src/github.com/influxdb"
   - cd "${GOPATH}/src/github.com/influxdb"
   - wget "https://github.com/influxdb/influxdb/archive/v${VER_INFLUXDB}.tar.gz" -O influxdb.tar.gz && tar -xf influxdb.tar.gz
